@@ -1,0 +1,4 @@
+npx expo install @expo/vector-icons lucide-react-native
+npx expo install react-native-chart-kit react-native-svg
+npm install react-native-confetti-cannon
+npx expo install expo-linear-gradient

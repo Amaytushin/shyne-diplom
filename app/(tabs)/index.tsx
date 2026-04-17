@@ -1,98 +1,191 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { mockData } from "../../constants/mockData";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const getStatIcon = (label: string) => {
+    switch (label) {
+      case "Бүлэг":
+        return { name: "book", color: "#4A90E2" };
+      case "Зүйл":
+        return { name: "document-text", color: "#50E3C2" };
+      case "Заалт":
+        return { name: "list", color: "#F5A623" };
+      default:
+        return { name: "git-branch", color: "#B8E986" };
+    }
+  };
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.headerCard}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Улаанбаатар Технологи Горим</Text>
+            <Text style={styles.headerYear}>2026</Text>
+          </View>
+          <View style={styles.logoCircle}>
+            <Ionicons name="train" size={30} color="#fff" />
+          </View>
+        </View>
+        <Text style={styles.headerSub}>
+          Станцын технологийн горимын цахим систем
+        </Text>
+        <View style={styles.dateBadge}>
+          <Text style={styles.dateText}>🕒 2026.04.17</Text>
+        </View>
+      </View>
+
+      <View style={styles.statsGrid}>
+        {mockData.stats.map((item) => {
+          const icon = getStatIcon(item.label);
+          return (
+            <View key={item.id} style={styles.statBox}>
+              <View
+                style={[
+                  styles.statIconCircle,
+                  { backgroundColor: icon.color + "15" },
+                ]}
+              >
+                <Ionicons
+                  name={icon.name as any}
+                  size={18}
+                  color={icon.color}
+                />
+              </View>
+              <Text style={styles.statValue}>{item.value}</Text>
+              <Text style={styles.statLabel}>{item.label}</Text>
+            </View>
+          );
+        })}
+      </View>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Түргэн хандалт</Text>
+        <TouchableOpacity onPress={() => router.push("/chapters")}>
+          <Text style={styles.seeAll}>Бүгдийг харах →</Text>
+        </TouchableOpacity>
+      </View>
+
+      {mockData.chapters.slice(0, 4).map((item, index) => (
+        <TouchableOpacity
+          key={item.id}
+          style={styles.card}
+          onPress={() => router.push(`/chapter/${item.id}`)}
+        >
+          <View
+            style={[
+              styles.iconPlaceholder,
+              { backgroundColor: index % 2 === 0 ? "#E3F2FD" : "#F3E5F5" },
+            ]}
+          >
+            <Ionicons name="layers-outline" size={22} color="#1a4371" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.cardSmallTitle}>{item.title}</Text>
+            <Text numberOfLines={1} style={styles.cardMainTitle}>
+              {item.desc}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color="#ccc" />
+        </TouchableOpacity>
+      ))}
+      <View style={{ height: 30 }} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, backgroundColor: "#f8f9ff", padding: 16 },
+  headerCard: {
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 30,
+    marginBottom: 24,
+    elevation: 4,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  logoCircle: {
+    width: 50,
+    height: 50,
+    backgroundColor: "#1a4371",
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
+  headerTitle: { fontSize: 16, fontWeight: "600", color: "#1a4371" },
+  headerYear: { fontSize: 38, fontWeight: "900", color: "#1a4371" },
+  headerSub: { color: "#555", fontSize: 13, marginTop: 8 },
+  dateBadge: {
+    backgroundColor: "#f0f0f0",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginTop: 15,
+  },
+  dateText: { fontSize: 11, color: "#777" },
+  statsGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 25,
+  },
+  statBox: {
+    backgroundColor: "#fff",
+    width: "23%",
+    paddingVertical: 15,
+    borderRadius: 20,
+    alignItems: "center",
+    elevation: 2,
+  },
+  statIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  statValue: { fontSize: 16, fontWeight: "bold", color: "#1a4371" },
+  statLabel: { fontSize: 10, color: "#999" },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#222" },
+  seeAll: { color: "#1a4371", fontSize: 13, fontWeight: "600" },
+  card: {
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 20,
+    marginBottom: 12,
+    elevation: 1,
+  },
+  iconPlaceholder: {
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  cardSmallTitle: { fontSize: 10, color: "#1a4371", fontWeight: "bold" },
+  cardMainTitle: { fontSize: 14, color: "#333", marginTop: 2 },
 });
